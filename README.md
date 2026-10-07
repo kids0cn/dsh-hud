@@ -40,6 +40,8 @@ plugin_manager install_bundle  target=github:kids0cn/dsh-hud
 - 计数**按 session 独立**（投影 cell 逐会话隔离），不是全局累计。
 - 详情框显示前会剥掉 handlerId 尾部的 `:序号`（claude-code 旧桥每次触发自增序号，
   native 脚本名不受影响）。
+- **已退役桥的历史不参与显示**：迁移到 DSH native hook 之前的 `claude-code:` / `codex:`
+  方言触发仍留在会话日志里，但 HUD 的行数与总数都已把它们过滤——HUD 反映的是当前在用的 hook 体系。
 
 ## 兼容性与降级
 

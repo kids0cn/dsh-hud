@@ -157,13 +157,17 @@ window.__ModuleLoader__.load({
       const hud = useProjection('agentHud');
       if (!hud) return h(Diag, { kind: 'no-data' });
 
-      // The claude-code bridge mints `dialect:point:<globalCounter>` per
-      // INVOCATION (nextHandlerId in dsh-hooks-claude-code) and the log
-      // carries no configured-hook name — strip the counter so one row = one
-      // hook point (claude-code:Stop ×N), not one row per individual firing.
+      // Retired bridges (claude-code / codex dialects): the user migrated to
+      // DSH native hooks, and pre-migration firings stay in the durable log.
+      // Filter them from rows AND totals so the HUD reflects the live hook
+      // system; history remains queryable in the session log itself.
+      // Native handlerIds are script names (no :counter); the strip below is
+      // a no-op for them and only collapses any legacy per-invocation form.
       const hookAgg = {};
       for (const [k, n] of Object.entries(hud.hooks || {})) {
-        const key = String(k).replace(/:\d+$/, '');
+        const raw = String(k);
+        if (/^(claude-code|codex):/.test(raw)) continue;
+        const key = raw.replace(/:\d+$/, '');
         hookAgg[key] = (hookAgg[key] || 0) + n;
       }
       const hookEntries = Object.entries(hookAgg).sort((a, b) => b[1] - a[1]);
